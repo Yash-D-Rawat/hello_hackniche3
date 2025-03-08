@@ -28,10 +28,10 @@ const SlideTabs = () => {
       className="relative mx-auto flex w-fit rounded-full border-2 border-yellow-300 bg-white p-1"
     >
 <Tab setPosition={setPosition}><Link to="/">Home</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/events">Shows</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/artists">Artist</Link></Tab>
+<Tab setPosition={setPosition}><Link to="/Collabarotion">Collaboration</Link></Tab>
+<Tab setPosition={setPosition}><Link to="/StroyBoard">StoryBoard</Link></Tab>
+<Tab setPosition={setPosition}><Link to="/blog">Blogs</Link></Tab>
 <Tab setPosition={setPosition}><Link to="/profile">Profile</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/blog">Blog</Link></Tab>
 
       <Cursor position={position} />
     </ul>
@@ -55,7 +55,7 @@ const Tab = ({ children, setPosition }) => {
           opacity: 1,
         });
       }}
-      className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-white mix-blend-difference md:px-5 md:py-3 md:text-base"
+      className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-black hover:text-white  md:px-5 md:py-3 md:text-base"
     >
       {children}
     </li>
@@ -68,7 +68,7 @@ const Cursor = ({ position }) => {
       animate={{
         ...position,
       }}
-      className="absolute z-0 h-7 rounded-full bg-black md:h-12"
+      className="absolute z-0 h-7 rounded-full bg-blue  md:h-12"
     />
   );
 };

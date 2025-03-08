@@ -79,7 +79,7 @@ const ScrollingTestimonials = () => {
       <div className="relative">
         {/* First row - scrolling right */}
         <div className="flex animate-scroll-right">
-          <div className="flex whitespace-nowrap">
+          <div className="flex ">
             {[...testimonials1, ...testimonials1].map((testimonial, index) => (
               <Testimonial key={`row1-${index}`} {...testimonial} />
             ))}
@@ -88,7 +88,7 @@ const ScrollingTestimonials = () => {
 
         {/* Second row - scrolling left */}
         <div className="flex mt-8 animate-scroll-left">
-          <div className="flex">
+          <div className="flex ">
             {[...testimonials2, ...testimonials2].map((testimonial, index) => (
               <Testimonial key={`row2-${index}`} {...testimonial} />
             ))}
