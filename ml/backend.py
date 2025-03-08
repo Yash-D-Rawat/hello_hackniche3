@@ -12,7 +12,8 @@ from PIL import Image, UnidentifiedImageError
 load_dotenv()
 
 API_URL = "https://api-inference.huggingface.co/models/ZB-Tech/Text-to-Image"
-API_TOKEN = os.getenv("HUGGINGFACE_API_TOKEN")
+API_TOKEN = os.getenv("HUGGINGFACE_FACE_TOKEN")
+print(API_TOKEN)
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 app = FastAPI()
