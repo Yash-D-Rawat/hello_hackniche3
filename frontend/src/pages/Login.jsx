@@ -28,7 +28,7 @@ const LogIn = () => {
       const response = await axios.post(endpoint, payload);
       console.log("Response:", response.data);
       if (isLogin) {
-        navigate("/events");
+        navigate("/home");
       }
     } catch (error) {
       console.error("Error:", error.response?.data || error.message);
