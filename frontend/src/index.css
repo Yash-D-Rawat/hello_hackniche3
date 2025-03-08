@@ -1,5 +1,29 @@
 @import "tailwindcss";
-@theme{
+
+/* Define custom theme variables */
+@theme {
     --color-blue: #4692E1;
     --color-orange: #FF7F50;
 }
+
+/* Add animations using @layer */
+@layer utilities {
+    @keyframes scroll-right {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(100%); }
+    }
+
+    @keyframes scroll-left {
+        0% { transform: translateX(0%); }
+        100% { transform: translateX(-100%); }
+    }
+
+    .animate-scroll-right {
+        animation: scroll-right 30s linear infinite;
+    }
+
+    .animate-scroll-left {
+        animation: scroll-left 30s linear infinite;
+    }
+}
+

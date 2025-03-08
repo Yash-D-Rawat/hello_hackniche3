@@ -69,7 +69,7 @@ const BentoGrid = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[SteelBlue] py-12 px-4">
+    <div className="min-h-screen bg-blue py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8 text-center">
           Upcoming Shows

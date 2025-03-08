@@ -4,6 +4,7 @@ import hero from "../assets/Hero-copy.png";
 import Footer from "../components/Footer";
 import BentoGrid from "../components/BentoGrid";
 import FeaturesSection from "../components/FeaturesSection";
+import ScrollingTestimonials from "../components/ScrollingTestimonials";
 
 const HomePage = () => {
   return (
@@ -30,6 +31,7 @@ const HomePage = () => {
     </div>
     <FeaturesSection/>
     <BentoGrid/>
+    <ScrollingTestimonials/>
     <Footer/>
     </div>
   );
