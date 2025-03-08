@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import axios from "axios";
+import axios from "axios";
 import { Mail, Lock, UserPlus } from "lucide-react";
-// import { login, register } from "../apiroutes/index";
+import { login, register } from "../apiroutes/index";
 
 const LogIn = () => {
   const [isLogin, setIsLogin] = useState(true);
