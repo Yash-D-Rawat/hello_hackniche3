@@ -27,6 +27,8 @@ const LogIn = () => {
 
       const response = await axios.post(endpoint, payload);
       console.log("Response:", response.data);
+      localStorage.setItem("userId", response.data.data.user._id);
+      console.log("User ID:", response.data.data.user._id);
       if (isLogin) {
         navigate("/home");
       }
