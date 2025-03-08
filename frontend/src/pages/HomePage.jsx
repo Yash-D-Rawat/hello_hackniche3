@@ -2,9 +2,12 @@ import React from "react";
 import {Navbar} from "../components/Navbar";
 import hero from "../assets/Hero-copy.png";
 import Footer from "../components/Footer";
+import BentoGrid from "../components/BentoGrid";
+import FeaturesSection from "../components/FeaturesSection";
 
 const HomePage = () => {
   return (
+    <div>
     <div className="relative">
        <Navbar /> 
       {/* Background section with text aligned left */}
@@ -24,7 +27,10 @@ const HomePage = () => {
 
       {/* Hero image */}
       <img className=" w-full mix-blend-multiply bg-blue" src={hero} alt="Descriptive Alt Text" />
-      <Footer/>
+    </div>
+    <FeaturesSection/>
+    <BentoGrid/>
+    <Footer/>
     </div>
   );
 };
