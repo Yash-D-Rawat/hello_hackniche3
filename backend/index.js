@@ -8,7 +8,7 @@ import connectToDatabase from "./config/mongodb.js";
 import errorMiddleware from "./middleware/error.middleware.js";
 
 import authRouter from "./routes/auth.routes.js";
-import Document from "./models/Document.js"; // Assuming correct path
+import documentDb from "./models/document.db.js";
 
 const app = express();
 
@@ -65,7 +65,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("save-document", async (data) => {
-      await Document.findByIdAndUpdate(documentId, { data });
+      await documentDb.findByIdAndUpdate(documentId, { data });
     });
   });
 
@@ -78,10 +78,10 @@ io.on("connection", (socket) => {
 async function findOrCreateDocument(id) {
   if (!id) return null;
 
-  const document = await Document.findById(id);
+  const document = await documentDb.findById(id);
   if (document) return document;
 
-  return await Document.create({ _id: id, data: defaultValue });
+  return await documentDb.create({ _id: id, data: defaultValue });
 }
 
 // Start Server & Database Connection
