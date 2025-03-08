@@ -12,7 +12,7 @@ import { Navbar } from "./components/Navbar";
 import TextImage from "./pages/TextImage";
 import TextEditor from "./components/Collaboration/TextEditor";
 import WhisperSpeechToText from "./pages/WhisperSpeechToText ";
-import Profile from "./pages/Profile";
+// import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
             path="/Collabarotion"
             element={<Navigate to={`/Collabarotion/${uuidV4()}`} />}
           />
-          <Route path="/profile" element={<Profile />} />
+          {/* <Route path="/profile" element={<Profile />} /> */}
         </Routes>
       </Router>
     </>

@@ -74,72 +74,151 @@ io.on("connection", (socket) => {
     });
 
     socket.on("save-document", async (data) => {
-      // First update the main document
-      await documentDb.findByIdAndUpdate(documentId, { data });
+      try {
+        // First update the main document
+        await documentDb.findByIdAndUpdate(documentId, { data });
 
-      // Then create a new version
-      // Get the current highest version number
-      const latestVersion = await DocumentVersion.findOne({ documentId }).sort({
-        versionNumber: -1,
-      });
+        // Then create a new version
+        // Get the current highest version number
+        const latestVersion = await DocumentVersion.findOne({
+          documentId,
+        }).sort({
+          versionNumber: -1,
+        });
 
-      const versionNumber = latestVersion ? latestVersion.versionNumber + 1 : 1;
+        const versionNumber = latestVersion
+          ? latestVersion.versionNumber + 1
+          : 1;
 
-      // Store the new version
-      await DocumentVersion.create({
-        documentId,
-        data,
-        versionNumber,
-        createdBy: socket.userId, // You'll need to set this when auth is implemented
-        description: `Auto-saved version ${versionNumber}`,
-      });
+        // Store the new version
+        await DocumentVersion.create({
+          documentId,
+          data,
+          versionNumber,
+          createdBy: socket.userId, // You'll need to set this when auth is implemented
+          description: `Auto-saved version ${versionNumber}`,
+        });
 
-      // Notify all clients in the room about the new version
-      io.to(documentId).emit("version-created", {
-        versionNumber,
-        createdAt: new Date(),
-        description: `Auto-saved version ${versionNumber}`,
-      });
+        // Notify all clients in the room about the new version
+        io.to(documentId).emit("version-created", {
+          versionNumber,
+          createdAt: new Date(),
+          description: `Auto-saved version ${versionNumber}`,
+        });
+      } catch (error) {
+        console.error("Error in save-document:", error);
+        socket.emit("error", { message: "Failed to save document" });
+      }
     });
 
     // New handler for version management
     socket.on("get-version", async ({ documentId, versionNumber }) => {
-      const version = await DocumentVersion.findOne({
-        documentId,
-        versionNumber,
-      });
-      if (version) {
-        socket.emit("load-version", version.data);
+      try {
+        const version = await DocumentVersion.findOne({
+          documentId,
+          versionNumber,
+        });
+        if (version) {
+          socket.emit("load-version", version.data);
+        } else {
+          socket.emit("error", { message: "Version not found" });
+        }
+      } catch (error) {
+        console.error("Error in get-version:", error);
+        socket.emit("error", { message: "Failed to retrieve version" });
       }
     });
 
     // Allow user to save a version with custom description
     socket.on("save-version", async ({ documentId, data, description }) => {
-      const latestVersion = await DocumentVersion.findOne({ documentId }).sort({
-        versionNumber: -1,
-      });
+      try {
+        const latestVersion = await DocumentVersion.findOne({
+          documentId,
+        }).sort({
+          versionNumber: -1,
+        });
 
-      const versionNumber = latestVersion ? latestVersion.versionNumber + 1 : 1;
+        const versionNumber = latestVersion
+          ? latestVersion.versionNumber + 1
+          : 1;
 
-      await DocumentVersion.create({
-        documentId,
-        data,
-        versionNumber,
-        createdBy: socket.userId, // Will be set with auth
-        description: description || `Version ${versionNumber}`,
-      });
+        await DocumentVersion.create({
+          documentId,
+          data,
+          versionNumber,
+          createdBy: socket.userId, // Will be set with auth
+          description: description || `Version ${versionNumber}`,
+        });
 
-      // Notify all clients
-      const newVersion = {
-        versionNumber,
-        createdAt: new Date(),
-        description: description || `Version ${versionNumber}`,
-      };
+        // Notify all clients
+        const newVersion = {
+          versionNumber,
+          createdAt: new Date(),
+          description: description || `Version ${versionNumber}`,
+        };
 
-      io.to(documentId).emit("version-created", newVersion);
+        io.to(documentId).emit("version-created", newVersion);
 
-      return newVersion;
+        return newVersion;
+      } catch (error) {
+        console.error("Error in save-version:", error);
+        socket.emit("error", { message: "Failed to save version" });
+      }
     });
+
+    // Add new handler for restoring a version as the current document
+    socket.on(
+      "restore-version",
+      async ({ documentId, data, restoredFromVersion }) => {
+        try {
+          // 1. Update the main document with the version data
+          await documentDb.findByIdAndUpdate(documentId, { data });
+
+          // 2. Create a new version entry indicating this is restored from a previous version
+          const latestVersion = await DocumentVersion.findOne({
+            documentId,
+          }).sort({
+            versionNumber: -1,
+          });
+
+          const versionNumber = latestVersion
+            ? latestVersion.versionNumber + 1
+            : 1;
+
+          // Create a new version that shows it was restored from a previous version
+          await DocumentVersion.create({
+            documentId,
+            data,
+            versionNumber,
+            createdBy: socket.userId,
+            description: `Restored from version ${restoredFromVersion}`,
+          });
+
+          // 3. Notify all connected clients about the update
+          const restoredVersion = {
+            versionNumber,
+            createdAt: new Date(),
+            description: `Restored from version ${restoredFromVersion}`,
+          };
+
+          // Notify about the new version created
+          io.to(documentId).emit("version-created", restoredVersion);
+
+          // Broadcast the restored document to all clients (including the requester)
+          io.to(documentId).emit("load-document", data);
+
+          // Send specific success message to the client that requested the restore
+          socket.emit("version-restored", {
+            success: true,
+            message: `Successfully restored from version ${restoredFromVersion}`,
+            versionNumber: restoredVersion.versionNumber,
+          });
+        } catch (error) {
+          console.error("Error in restore-version:", error);
+          socket.emit("error", { message: "Failed to restore version" });
+        }
+      }
+    );
 
     // Add user authentication to socket connection
     socket.on("set-user", (userId) => {
