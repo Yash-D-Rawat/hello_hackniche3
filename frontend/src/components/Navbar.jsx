@@ -5,7 +5,7 @@ import WhisperSpeech from "../pages/WhisperSpeechToText ";
 
 export const Navbar = () => {
   return (
-    <div className=" bg-blue py-5">
+    <div className="bg-blue py-5">
       <SlideTabs />
     </div>
   );
@@ -19,7 +19,10 @@ const SlideTabs = () => {
   });
 
   return (
-    <ul
+    <motion.ul
+      initial={{ opacity: 0, y: -50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
       onMouseLeave={() => {
         setPosition((pv) => ({
           ...pv,
@@ -28,18 +31,30 @@ const SlideTabs = () => {
       }}
       className="relative mx-auto flex w-fit rounded-full border-2 border-yellow-300 bg-white p-1"
     >
-<Tab setPosition={setPosition}><Link to="/">Home</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/Collabarotion">Collaboration</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/StroyBoard">StoryBoard</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/blog">Blogs</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/WhisperSpeech">Speech-Text</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/TextImage">Text-Image</Link></Tab>
-<Tab setPosition={setPosition}><Link to="/profile">Profile</Link></Tab>
-
-
+      <Tab setPosition={setPosition}>
+        <Link to="/">Home</Link>
+      </Tab>
+      <Tab setPosition={setPosition}>
+        <Link to="/Collabarotion">Collaboration</Link>
+      </Tab>
+      <Tab setPosition={setPosition}>
+        <Link to="/StroyBoard">StoryBoard</Link>
+      </Tab>
+      <Tab setPosition={setPosition}>
+        <Link to="/blog">Blogs</Link>
+      </Tab>
+      <Tab setPosition={setPosition}>
+        <Link to="/WhisperSpeech">Speech-Text</Link>
+      </Tab>
+      <Tab setPosition={setPosition}>
+        <Link to="/">Text-Image</Link>
+      </Tab>
+      <Tab setPosition={setPosition}>
+        <Link to="/profile">Profile</Link>
+      </Tab>
 
       <Cursor position={position} />
-    </ul>
+    </motion.ul>
   );
 };
 
@@ -47,7 +62,10 @@ const Tab = ({ children, setPosition }) => {
   const ref = useRef(null);
 
   return (
-    <li
+    <motion.li
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
       ref={ref}
       onMouseEnter={() => {
         if (!ref?.current) return;
@@ -63,7 +81,7 @@ const Tab = ({ children, setPosition }) => {
       className="relative z-10 block cursor-pointer px-3 py-1.5 text-xs uppercase text-black hover:text-white  md:px-5 md:py-3 md:text-base"
     >
       {children}
-    </li>
+    </motion.li>
   );
 };
 

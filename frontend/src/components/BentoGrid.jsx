@@ -14,8 +14,8 @@ const BentoGrid = () => {
       case 1:
         return {
           headline:
-            "Digital Innovation Hub Launches Revolutionary AI-Powered Platform",
-          news: "Our Digital Innovation Hub has unveiled a groundbreaking AI-powered platform that promises to revolutionize how businesses approach digital transformation. The platform combines advanced machine learning algorithms with intuitive user interfaces, enabling companies to accelerate their innovation initiatives by up to 300%.",
+            "Text To Image",
+          news: "Transform your words into stunning, high-quality images with AI-powered text-to-image generation.",
         };
       case 2:
         return {
@@ -39,13 +39,13 @@ const BentoGrid = () => {
   const cards = [
     {
       id: 1,
-      title: "The Comedy show",
+      title: "Text To Image",
       description:
-        "Explore the future of technology and digital transformation. Join our community of innovators and thought leaders.",
+        "Transform your words into stunning, high-quality images with AI-powered text-to-image generation.",
       icon: "fa-solid fa-rocket",
       size: "large",
       imageUrl:
-        "https://media.istockphoto.com/id/169969765/photo/lounge-singer-taking-a-break.jpg?s=1024x1024&w=is&k=20&c=WZwEnlADfPSGVQ9XWunmv_m2uv5_tn3LfTTCENvT4EY=",
+        "https://media.istockphoto.com/id/1494104649/photo/ai-chatbot-artificial-intelligence-digital-concept.jpg?s=1024x1024&w=is&k=20&c=FQZBVxbXjhgPzm-W-5Jo3O7x7OXLPugwXzTKEu6nV3w=",
     },
     {
       id: 2,
@@ -69,10 +69,10 @@ const BentoGrid = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-blue py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-white mb-8 text-center">
-          Upcoming Shows
+          MODELS WE PROVIDE
         </h1>
         <div className="grid grid-cols-4 gap-6 auto-rows-[200px]">
           {cards.map((card) => (
