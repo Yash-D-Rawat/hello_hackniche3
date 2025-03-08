@@ -20,8 +20,8 @@ const BentoGrid = () => {
       case 2:
         return {
           headline:
-            "AI Solutions Division Achieves Major Breakthrough in Natural Language Processing",
-          news: "Our research team has developed a new natural language processing model that achieves unprecedented accuracy in understanding context and sentiment. This breakthrough has immediate applications in customer service, content moderation, and market analysis.",
+            "Collaborative Editing",
+          news: "Collaborative editing enables multiple users to edit and interact with the same content in real time, enhancing teamwork and productivity",
         };
       case 3:
         return {

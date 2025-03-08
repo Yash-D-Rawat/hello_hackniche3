@@ -32,7 +32,7 @@ const SlideTabs = () => {
       className="relative mx-auto flex w-fit rounded-full border-2 border-yellow-300 bg-white p-1"
     >
       <Tab setPosition={setPosition}>
-        <Link to="/">Home</Link>
+        <Link to="/home">Home</Link>
       </Tab>
       <Tab setPosition={setPosition}>
         <Link to="/Collabarotion">Collaboration</Link>
@@ -47,7 +47,7 @@ const SlideTabs = () => {
         <Link to="/WhisperSpeech">Speech-Text</Link>
       </Tab>
       <Tab setPosition={setPosition}>
-        <Link to="/">Text-Image</Link>
+        <Link to="/TextImage">Text-Image</Link>
       </Tab>
       <Tab setPosition={setPosition}>
         <Link to="/profile">Profile</Link>

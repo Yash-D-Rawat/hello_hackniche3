@@ -1,4 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
 @import "tailwindcss";
+
+/* Apply Lato globally */
+@layer base {
+    body {
+        font-family: 'Lato', sans-serif;
+    }
+}
 
 /* Define custom theme variables */
 @theme {
@@ -35,6 +43,7 @@
     .animate-scroll-left {
         animation: scroll-left 30s linear infinite;
     }
+
     @keyframes wave {
         0%, 100% {
           transform: scaleY(0.5);
@@ -42,6 +51,5 @@
         50% {
           transform: scaleY(1);
         }
-      }
+    }
 }
-
