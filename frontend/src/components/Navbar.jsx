@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import WhisperSpeech from "../pages/WhisperSpeechToText ";
 
 export const Navbar = () => {
   return (
@@ -31,7 +32,11 @@ const SlideTabs = () => {
 <Tab setPosition={setPosition}><Link to="/Collabarotion">Collaboration</Link></Tab>
 <Tab setPosition={setPosition}><Link to="/StroyBoard">StoryBoard</Link></Tab>
 <Tab setPosition={setPosition}><Link to="/blog">Blogs</Link></Tab>
+<Tab setPosition={setPosition}><Link to="/WhisperSpeech">Speech-Text</Link></Tab>
+<Tab setPosition={setPosition}><Link to="/TextImage">Text-Image</Link></Tab>
 <Tab setPosition={setPosition}><Link to="/profile">Profile</Link></Tab>
+
+
 
       <Cursor position={position} />
     </ul>

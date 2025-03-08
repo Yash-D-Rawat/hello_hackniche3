@@ -35,4 +35,13 @@
     .animate-scroll-left {
         animation: scroll-left 30s linear infinite;
     }
+    @keyframes wave {
+        0%, 100% {
+          transform: scaleY(0.5);
+        }
+        50% {
+          transform: scaleY(1);
+        }
+      }
 }
+
