@@ -8,6 +8,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 import axios from "axios";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
+
+const formatResponse = (text) => {
+  const cleanedText = text.replace(/\\/g, ""); // Remove ** symbols
+  const htmlContent = marked(cleanedText); // Convert to HTML using marked
+  return DOMPurify.sanitize(htmlContent); // Sanitize HTML
+};
 
 export default function AISidebar({
   isOpen,
@@ -77,7 +85,7 @@ export default function AISidebar({
     try {
       setIsLoading(true);
       const response = await axios.post(
-        "http://localhost:5000/api/content/enhance",
+        "http://localhost:4000/api/content/enhance",
         {
           content,
         }
@@ -85,6 +93,7 @@ export default function AISidebar({
 
       const enhancedContent = response.data.enhancedContent;
 
+      // enhancedContent = formatResponse(enhancedContent);
       // Store the suggestion along with its position
       const selection = quill.getSelection();
       if (selection) {
@@ -201,7 +210,7 @@ export default function AISidebar({
       }
 
       const response = await axios.post(
-        `http://localhost:5000${endpoint}`,
+        `http://localhost:4000${endpoint}`,
         requestData
       );
 
@@ -220,6 +229,8 @@ export default function AISidebar({
       } else {
         responseText = "Response received but no content found.";
       }
+
+      // responseText = formatResponse(responseText);
 
       addMessage({
         sender: "ai",
@@ -375,7 +386,12 @@ export default function AISidebar({
                       : "bg-white border border-gray-200 mr-auto"
                   }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <p
+                    className="text-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: formatResponse(message.text),
+                    }}
+                  ></p>
                   {message.sender === "ai" && (
                     <button
                       onClick={() => applyToEditor(message.text)}

@@ -1,7 +1,5 @@
 from flask import Flask, request, jsonify
 from langchain_google_genai import GoogleGenerativeAI
-from langchain.memory import ConversationBufferMemory
-from langchain.chains import ConversationChain
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
