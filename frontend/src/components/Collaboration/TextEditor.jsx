@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { io } from "socket.io-client";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   ChevronLeft,
   ChevronRight,
@@ -419,6 +419,14 @@ export default function TextEditor() {
               )}
             </div>
             <div className="flex items-center gap-2">
+              <button
+                onClick={handleShareModalToggle}
+                className="flex items-center gap-1 bg-blue hover:bg-blue-800 text-white px-3 py-1 rounded-2xl transition"
+                title="Share Document"
+                disabled={!isConnected}
+              >
+                <Link to={"/home"}>Go Back</Link>
+              </button>
               <button
                 onClick={handleShareModalToggle}
                 className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition"
