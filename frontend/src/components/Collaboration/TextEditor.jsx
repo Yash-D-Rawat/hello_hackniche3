@@ -462,17 +462,6 @@ export default function TextEditor() {
               </div>
             </div>
           )}
-          {notification && (
-            <div
-              className={`px-4 py-2 ${
-                notification.type === "success"
-                  ? "bg-green-100 text-green-800"
-                  : "bg-red-100 text-red-800"
-              }`}
-            >
-              {notification.message}
-            </div>
-          )}
           <div className="flex-1 overflow-auto">
             <div className="h-full" ref={wrapperRef}></div>
           </div>

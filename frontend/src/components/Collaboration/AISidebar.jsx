@@ -77,12 +77,16 @@ export default function AISidebar({
     const [line] = quill.getLines(selection.index);
     if (!line) return "";
 
-    return line.text();
-  };
+    // Instead of line.text(), we need to get the text from the line's offset and length
+    const lineIndex = quill.getIndex(line);
+    const lineLength = line.length();
 
+    return quill.getText(lineIndex, lineLength);
+  };
   // Generate enhanced content suggestion
   const generateEnhancedSuggestion = async (content) => {
     try {
+      console.log("Generate suggestion for content:", content);
       setIsLoading(true);
       const response = await axios.post(
         "http://localhost:4000/api/content/enhance",
@@ -92,23 +96,43 @@ export default function AISidebar({
       );
 
       const enhancedContent = response.data.enhancedContent;
+      console.log("Received enhanced content:", enhancedContent);
 
-      // enhancedContent = formatResponse(enhancedContent);
-      // Store the suggestion along with its position
+      // Here's the issue - we need to find the entire line, not just handle the newline
+      // Get the current selection
       const selection = quill.getSelection();
       if (selection) {
-        const [line] = quill.getLines(selection.index);
-        const lineIndex = quill.getIndex(line);
-        const lineLength = line.length();
+        // Find the line range by searching backwards for a newline or start of document
+        let startIndex = selection.index;
+        while (startIndex > 0 && quill.getText(startIndex - 1, 1) !== "\n") {
+          startIndex--;
+        }
 
-        setSuggestion({
-          original: content,
+        // The length should be from our starting position to the current position
+        const lineLength = selection.index - startIndex + 1; // +1 to include the newline
+        const lineText = quill.getText(startIndex, lineLength);
+
+        console.log("Line details:", {
+          startIndex,
+          lineLength,
+          lineText,
+          selectionIndex: selection.index,
+        });
+
+        const suggestionObj = {
+          original: lineText,
           enhanced: enhancedContent,
           position: {
-            index: lineIndex,
+            index: startIndex,
             length: lineLength,
+            text: lineText,
           },
-        });
+        };
+
+        console.log("Setting suggestion state:", suggestionObj);
+        setSuggestion(suggestionObj);
+      } else {
+        console.error("No selection available in quill");
       }
     } catch (error) {
       console.error("Error generating suggestion:", error);
@@ -124,17 +148,49 @@ export default function AISidebar({
 
   // Accept suggestion
   const acceptSuggestion = () => {
-    if (!suggestion || !quill) return;
+    console.log("Accept suggestion function called");
+
+    if (!suggestion) {
+      console.error("No suggestion found in state");
+      return;
+    }
+
+    if (!quill) {
+      console.error("Quill editor not found");
+      return;
+    }
 
     const { position, enhanced } = suggestion;
-    quill.deleteText(position.index, position.length);
-    quill.insertText(position.index, enhanced);
 
-    addMessage({
-      sender: "system",
-      text: "Suggestion applied!",
-      type: "success",
-    });
+    console.log("Full suggestion object:", JSON.stringify(suggestion));
+    console.log("Position details:", position);
+    console.log("Enhanced text:", enhanced);
+
+    try {
+      // Delete and replace the entire line
+      console.log(
+        `Attempting to delete text at index ${position.index} with length ${position.length}`
+      );
+      quill.deleteText(position.index, position.length);
+
+      console.log(`Attempting to insert text at index ${position.index}`);
+      quill.insertText(position.index, enhanced);
+
+      console.log("Text operations completed");
+
+      addMessage({
+        sender: "system",
+        text: "Suggestion applied!",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("Error applying suggestion:", error);
+      addMessage({
+        sender: "system",
+        text: "Error applying suggestion: " + error.message,
+        type: "error",
+      });
+    }
 
     setSuggestion(null);
   };
@@ -347,13 +403,19 @@ export default function AISidebar({
               </p>
               <div className="flex justify-end gap-2">
                 <button
-                  onClick={rejectSuggestion}
+                  onClick={() => {
+                    console.log("Reject button clicked");
+                    rejectSuggestion();
+                  }}
                   className="p-1 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition"
                 >
                   <X size={16} />
                 </button>
                 <button
-                  onClick={acceptSuggestion}
+                  onClick={() => {
+                    console.log("Accept button clicked");
+                    acceptSuggestion();
+                  }}
                   className="p-1 rounded-full bg-green-100 text-green-600 hover:bg-green-200 transition"
                 >
                   <Check size={16} />

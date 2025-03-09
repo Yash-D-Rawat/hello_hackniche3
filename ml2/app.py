@@ -51,6 +51,25 @@ def poetic_analysis():
     except Exception as e:
         print("Error:", e)
         return jsonify({"error": "Failed to analyze poetic content"}), 500
+    
+@app.route("/api/content/speech-text", methods=["POST"])
+def speech_text():
+    """speech to text."""
+    try:
+        data = request.json
+        content = data.get("content")
+
+        if not content:
+            return jsonify({"error": "Content is required"}), 400
+
+        prompt = f"{content}"
+        speech_text = gemini.invoke(prompt)
+
+        return jsonify({"speechContent": speech_text})
+
+    except Exception as e:
+        print("Error:", e)
+        return jsonify({"error": "Failed to analyze speech content"}), 500
 
 
 @app.route("/api/content/sentiment-analysis", methods=["POST"])

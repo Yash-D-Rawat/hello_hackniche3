@@ -2,6 +2,15 @@ import React, { useState, useRef, useEffect } from "react";
 import { Mic, MessageSquare, StopCircle, Trash2 } from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import Speech from "../assets/Speech.png";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
+import axios from "axios";
+
+const formatResponse = (text) => {
+  const cleanedText = text.replace(/\\/g, ""); // Remove ** symbols
+  const htmlContent = marked(cleanedText); // Convert to HTML using marked
+  return DOMPurify.sanitize(htmlContent); // Sanitize HTML
+};
 
 function WhisperSpeechToText() {
   const [transcript, setTranscript] = useState("");
@@ -10,7 +19,9 @@ function WhisperSpeechToText() {
   const recognitionRef = useRef(null);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  
+  const [suggestion, setSuggestion] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   // Canvas reference for audio visualization
   const canvasRef = useRef(null);
   const animationRef = useRef(null);
@@ -18,6 +29,33 @@ function WhisperSpeechToText() {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const mediaStreamRef = useRef(null);
+
+  const generateSuggestion = async (content) => {
+    try {
+      console.log("Generate suggestion for content:", content);
+      setIsLoading(true);
+      const response = await axios.post(
+        "http://localhost:4000/api/content/speech-text",
+        {
+          content,
+        }
+      );
+
+      const speechContent = response.data.enhancedContent;
+      console.log("Received enhanced content:", speechContent);
+
+      const suggestionObj = {
+        speech: speechContent,
+      };
+
+      console.log("Setting suggestion state:", suggestionObj);
+      setSuggestion(suggestionObj);
+    } catch (error) {
+      console.error("Error generating suggestion:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (transcript) {
@@ -41,22 +79,23 @@ function WhisperSpeechToText() {
       // Get user media stream
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
-      
+
       // Create audio context and analyzer
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
       audioContextRef.current = audioContext;
-      
+
       const analyser = audioContext.createAnalyser();
       analyserRef.current = analyser;
       analyser.fftSize = 256;
-      
+
       const source = audioContext.createMediaStreamSource(stream);
       source.connect(analyser);
-      
+
       const bufferLength = analyser.frequencyBinCount;
       const dataArray = new Uint8Array(bufferLength);
       dataArrayRef.current = dataArray;
-      
+
       // Start visualization
       visualize();
     } catch (err) {
@@ -67,49 +106,50 @@ function WhisperSpeechToText() {
 
   // Visualization function
   const visualize = () => {
-    if (!canvasRef.current || !analyserRef.current || !dataArrayRef.current) return;
+    if (!canvasRef.current || !analyserRef.current || !dataArrayRef.current)
+      return;
 
     const canvas = canvasRef.current;
     const canvasCtx = canvas.getContext("2d");
     const width = canvas.width;
     const height = canvas.height;
-    
+
     const analyser = analyserRef.current;
     const dataArray = dataArrayRef.current;
-    
+
     const draw = () => {
       animationRef.current = requestAnimationFrame(draw);
-      
+
       analyser.getByteTimeDomainData(dataArray);
-      
+
       canvasCtx.fillStyle = "rgb(249, 250, 251)"; // bg-gray-50
       canvasCtx.fillRect(0, 0, width, height);
-      
+
       canvasCtx.lineWidth = 2;
       canvasCtx.strokeStyle = "rgb(16, 185, 129)"; // text-emerald-500
-      
+
       canvasCtx.beginPath();
-      
+
       const sliceWidth = width / dataArray.length;
       let x = 0;
-      
+
       for (let i = 0; i < dataArray.length; i++) {
         const v = dataArray[i] / 128.0;
-        const y = v * height / 2;
-        
+        const y = (v * height) / 2;
+
         if (i === 0) {
           canvasCtx.moveTo(x, y);
         } else {
           canvasCtx.lineTo(x, y);
         }
-        
+
         x += sliceWidth;
       }
-      
+
       canvasCtx.lineTo(canvas.width, canvas.height / 2);
       canvasCtx.stroke();
     };
-    
+
     draw();
   };
 
@@ -118,24 +158,28 @@ function WhisperSpeechToText() {
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
-    
+
     if (audioContextRef.current) {
       audioContextRef.current.close().catch(console.error);
     }
-    
+
     if (mediaStreamRef.current) {
-      mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      mediaStreamRef.current.getTracks().forEach((track) => track.stop());
     }
   };
 
   const startListening = async () => {
     setError(null);
     try {
-      if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
+      if (
+        !("webkitSpeechRecognition" in window) &&
+        !("SpeechRecognition" in window)
+      ) {
         throw new Error("Speech recognition not supported in this browser.");
       }
 
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognition();
 
       recognitionRef.current.continuous = true;
@@ -171,7 +215,7 @@ function WhisperSpeechToText() {
 
       recognitionRef.current.start();
       setIsListening(true);
-      
+
       // Start audio visualization
       await setupAudioVisualization();
     } catch (err) {
@@ -186,6 +230,7 @@ function WhisperSpeechToText() {
       setIsListening(false);
       cleanupAudioVisualization();
     }
+    generateSuggestion(displayedText);
   };
 
   const clearTranscript = () => {
@@ -196,16 +241,12 @@ function WhisperSpeechToText() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
-      
+
       <div className="w-full mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
           {/* Hero Image */}
           <div className="flex justify-center">
-            <img
-              src={Speech}
-              alt="Voice Recognition"
-              className="max-w-full"
-            />
+            <img src={Speech} alt="Voice Recognition" className="max-w-full" />
           </div>
 
           {/* Steps */}
@@ -214,8 +255,12 @@ function WhisperSpeechToText() {
               <div className="flex items-center gap-4">
                 <Mic className="w-8 h-8 flex-shrink-0" />
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Step 1: Start Recording</h3>
-                  <p className="text-blue-100">Click the "Start Listening" button and get ready to speak</p>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Step 1: Start Recording
+                  </h3>
+                  <p className="text-blue-100">
+                    Click the "Start Listening" button and get ready to speak
+                  </p>
                 </div>
               </div>
             </div>
@@ -224,8 +269,12 @@ function WhisperSpeechToText() {
               <div className="flex items-center gap-4">
                 <MessageSquare className="w-8 h-8 flex-shrink-0" />
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Step 2: Speak Clearly</h3>
-                  <p className="text-purple-100">Speak your content clearly into the microphone</p>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Step 2: Speak Clearly
+                  </h3>
+                  <p className="text-purple-100">
+                    Speak your content clearly into the microphone
+                  </p>
                 </div>
               </div>
             </div>
@@ -234,8 +283,12 @@ function WhisperSpeechToText() {
               <div className="flex items-center gap-4">
                 <StopCircle className="w-8 h-8 flex-shrink-0" />
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Step 3: Review Text</h3>
-                  <p className="text-emerald-100">Stop recording and review your transcribed text</p>
+                  <h3 className="text-xl font-semibold mb-2">
+                    Step 3: Review Text
+                  </h3>
+                  <p className="text-emerald-100">
+                    Stop recording and review your transcribed text
+                  </p>
                 </div>
               </div>
             </div>
@@ -284,15 +337,17 @@ function WhisperSpeechToText() {
 
             {/* Transcript Area with Audio Wave */}
             <div className="relative p-6 bg-white border border-gray-200 rounded-2xl shadow-lg">
-              <h3 className="text-xl font-semibold mb-4 text-gray-800">Transcript</h3>
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                Transcript
+              </h3>
 
               {/* Audio Visualization - Only show when listening */}
               {isListening && (
                 <div className="mb-4 bg-gray-50 rounded-lg p-2 h-32">
-                  <canvas 
-                    ref={canvasRef} 
-                    width="600" 
-                    height="120" 
+                  <canvas
+                    ref={canvasRef}
+                    width="600"
+                    height="120"
                     className="w-full h-full"
                   ></canvas>
                 </div>
@@ -302,9 +357,16 @@ function WhisperSpeechToText() {
               <div className="min-h-[150px] p-4 bg-gray-50 rounded-lg">
                 <p className="text-gray-800 text-lg leading-relaxed">
                   {isTyping ? (
-                    <span>{displayedText}<span className="animate-pulse">|</span></span>
+                    <span>
+                      {displayedText}
+                      <span className="animate-pulse">|</span>
+                    </span>
                   ) : (
-                    transcript || <span className="text-gray-400 italic">Your spoken words will WhisperSpeechToTextear here...</span>
+                    transcript || (
+                      <span className="text-gray-400 italic">
+                        Your spoken words will WhisperSpeechToTextear here...
+                      </span>
+                    )
                   )}
                 </p>
               </div>
