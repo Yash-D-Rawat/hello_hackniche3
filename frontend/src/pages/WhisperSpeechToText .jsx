@@ -196,6 +196,7 @@ function WhisperSpeechToText() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
+      
       <div className="w-full mx-auto px-4">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-12">
           {/* Hero Image */}

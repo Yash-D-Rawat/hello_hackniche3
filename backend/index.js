@@ -16,7 +16,7 @@ const app = express();
 // Setup CORS
 app.use(
   cors({
-    origin: "http://localhost:5175", // Update frontend URL if needed
+    origin: "http://localhost:5173", // Update frontend URL if needed
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
