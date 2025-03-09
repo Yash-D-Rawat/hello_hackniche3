@@ -33,6 +33,7 @@ function App() {
             element={<Navigate to={`/Collabarotion/${uuidV4()}`} />}
           />
           {/* <Route path="/profile" element={<Profile />} /> */}
+          {/* <Route path="/profile" element={<Profile />} /> */}
         </Routes>
       </Router>
     </>
