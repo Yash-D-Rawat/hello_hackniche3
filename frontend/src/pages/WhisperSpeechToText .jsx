@@ -1,26 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Mic, MessageSquare, StopCircle, Trash2 } from "lucide-react";
+import {
+  Mic,
+  MessageSquare,
+  StopCircle,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
 import { Navbar } from "../components/Navbar";
 import Speech from "../assets/Speech.png";
-import { marked } from "marked";
-import DOMPurify from "dompurify";
 import axios from "axios";
-
-const formatResponse = (text) => {
-  const cleanedText = text.replace(/\\/g, ""); // Remove ** symbols
-  const htmlContent = marked(cleanedText); // Convert to HTML using marked
-  return DOMPurify.sanitize(htmlContent); // Sanitize HTML
-};
 
 function WhisperSpeechToText() {
   const [transcript, setTranscript] = useState("");
+  const [enhancedTranscript, setEnhancedTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState(null);
+  const [isEnhancing, setIsEnhancing] = useState(false);
   const recognitionRef = useRef(null);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [suggestion, setSuggestion] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Canvas reference for audio visualization
   const canvasRef = useRef(null);
@@ -29,33 +27,6 @@ function WhisperSpeechToText() {
   const analyserRef = useRef(null);
   const dataArrayRef = useRef(null);
   const mediaStreamRef = useRef(null);
-
-  const generateSuggestion = async (content) => {
-    try {
-      console.log("Generate suggestion for content:", content);
-      setIsLoading(true);
-      const response = await axios.post(
-        "http://localhost:4000/api/content/speech-text",
-        {
-          content,
-        }
-      );
-
-      const speechContent = response.data.enhancedContent;
-      console.log("Received enhanced content:", speechContent);
-
-      const suggestionObj = {
-        speech: speechContent,
-      };
-
-      console.log("Setting suggestion state:", suggestionObj);
-      setSuggestion(suggestionObj);
-    } catch (error) {
-      console.error("Error generating suggestion:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (transcript) {
@@ -197,6 +168,7 @@ function WhisperSpeechToText() {
         if (finalTranscript) {
           setTranscript((prev) => prev + " " + finalTranscript);
           setDisplayedText("");
+          setEnhancedTranscript(""); // Clear enhanced transcript when new content is added
         }
       };
 
@@ -230,12 +202,43 @@ function WhisperSpeechToText() {
       setIsListening(false);
       cleanupAudioVisualization();
     }
-    generateSuggestion(displayedText);
   };
 
   const clearTranscript = () => {
     setTranscript("");
     setDisplayedText("");
+    setEnhancedTranscript("");
+  };
+
+  // API call to enhance content
+  const enhanceContent = async () => {
+    if (!transcript.trim()) {
+      setError("No content to enhance. Please record some speech first.");
+      return;
+    }
+
+    setIsEnhancing(true);
+    setError(null);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/api/content/enhance",
+        {
+          content: transcript,
+        }
+      );
+
+      if (response.data && response.data.enhancedContent) {
+        setEnhancedTranscript(response.data.enhancedContent);
+      } else {
+        throw new Error("Received invalid response from enhancement API");
+      }
+    } catch (err) {
+      console.error("Content enhancement error:", err);
+      setError(`Failed to enhance content: ${err.message}`);
+    } finally {
+      setIsEnhancing(false);
+    }
   };
 
   return (
@@ -284,10 +287,10 @@ function WhisperSpeechToText() {
                 <StopCircle className="w-8 h-8 flex-shrink-0" />
                 <div>
                   <h3 className="text-xl font-semibold mb-2">
-                    Step 3: Review Text
+                    Step 3: Review & Enhance
                   </h3>
                   <p className="text-emerald-100">
-                    Stop recording and review your transcribed text
+                    Stop recording, review and enhance your transcribed text
                   </p>
                 </div>
               </div>
@@ -314,6 +317,26 @@ function WhisperSpeechToText() {
               ) : (
                 <>
                   <Mic className="w-6 h-6" /> Start Recording
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={enhanceContent}
+              disabled={isEnhancing || !transcript.trim()}
+              className={`px-6 py-4 font-bold rounded-lg flex items-center justify-center gap-2 text-lg transition-all duration-300 transform hover:scale-105 shadow-lg ${
+                isEnhancing
+                  ? "bg-indigo-300 text-white cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700"
+              }`}
+            >
+              {isEnhancing ? (
+                <>
+                  <RefreshCw className="w-6 h-6 animate-spin" /> Enhancing...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-6 h-6" /> Enhance Text
                 </>
               )}
             </button>
@@ -364,12 +387,26 @@ function WhisperSpeechToText() {
                   ) : (
                     transcript || (
                       <span className="text-gray-400 italic">
-                        Your spoken words will WhisperSpeechToTextear here...
+                        Your spoken words will appear here...
                       </span>
                     )
                   )}
                 </p>
               </div>
+
+              {/* Enhanced Transcript Section - Only show when there's enhanced content */}
+              {enhancedTranscript && (
+                <div className="mt-6">
+                  <h3 className="text-xl font-semibold mb-4 text-gray-800">
+                    Enhanced Transcript
+                  </h3>
+                  <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+                    <p className="text-gray-800 text-lg leading-relaxed">
+                      {enhancedTranscript}
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

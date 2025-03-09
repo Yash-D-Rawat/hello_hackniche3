@@ -560,7 +560,7 @@ export default function TextEditor() {
           </button>
         </div>
         {isShareModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-96 max-w-full">
               <h3 className="text-lg font-semibold mb-4">Share Document</h3>
               <form onSubmit={sendShareEmail} ref={formRef}>

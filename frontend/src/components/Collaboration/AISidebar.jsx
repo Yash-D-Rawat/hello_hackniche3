@@ -332,7 +332,7 @@ export default function AISidebar({
     <div
       className={`bg-gray-50 border-l border-gray-200 transition-all duration-300 ${
         isOpen ? "w-80" : "w-0"
-      } flex flex-col relative h-full`}
+      } flex flex-col relative h-full overflow-y-auto`}
     >
       {isOpen && (
         <div className="flex flex-col h-full">
@@ -398,9 +398,12 @@ export default function AISidebar({
               <h4 className="text-sm font-medium text-blue-800 mb-2">
                 Suggested Enhancement:
               </h4>
-              <p className="text-sm text-blue-900 mb-3">
-                {suggestion.enhanced}
-              </p>
+              <p
+                className="text-sm text-blue-900 mb-3"
+                dangerouslySetInnerHTML={{
+                  __html: formatResponse(suggestion.enhanced),
+                }}
+              ></p>
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => {
