@@ -266,7 +266,7 @@ function Profile() {
             <div className="bg-white p-6 rounded-lg shadow-md mb-6">
               <h2 className="text-xl font-bold mb-4 text-gray-800">
                 <UserPlus className="w-5 h-5 inline mr-2 text-blue-600" />
-                People to Follow
+                Your Collaborations
               </h2>
               <div className="space-y-4">
                 {[1, 2, 3].map((item) => (

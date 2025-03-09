@@ -2,6 +2,7 @@ import React from "react";
 import { File, Clock, Star, Users, MoreVertical, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const RecentDocuments = () => {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ const RecentDocuments = () => {
             whileHover={{ scale: 1.05 }}
             className="border border-gray-200 rounded-lg overflow-hidden shadow-sm"
           >
+            <Link to={`/collabarotion/85e15121-d003-4e29-aead-f8c801baf08a`}>
             <div className="h-36 bg-gray-100 flex items-center justify-center border-b">
               <span className="text-2xl">{doc.icon}</span>
             </div>
@@ -65,6 +67,7 @@ const RecentDocuments = () => {
                 <span>{doc.lastModified}</span>
               </div>
             </div>
+            </Link>
           </motion.div>
         ))}
       </div>
