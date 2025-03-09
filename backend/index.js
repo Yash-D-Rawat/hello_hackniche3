@@ -13,14 +13,15 @@ import DocumentVersion from "./models/documentVersion.js";
 
 const app = express();
 
-// Setup CORS
 app.use(
   cors({
-    origin: "http://localhost:5175", // Update frontend URL if needed
+    origin: "*", // Allows all origins
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // ⚠️ Note: `credentials: true` does not work with `origin: "*"`
   })
 );
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -43,7 +44,7 @@ const httpServer = createServer(app);
 // Setup Socket.io
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:5175", // Match frontend URL
+    origin: "http://localhost:5173", // Match frontend URL
     methods: ["GET", "POST"],
   },
 });

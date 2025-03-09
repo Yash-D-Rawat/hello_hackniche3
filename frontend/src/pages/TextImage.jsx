@@ -87,7 +87,7 @@ function TextImage() {
         loading: true 
       }]);
 
-      const response = await fetch(`http://localhost:8000/generate-image?prompt=${encodeURIComponent(prompt)}`);
+      const response = await fetch(`http://localhost:8080/generate-image?prompt=${encodeURIComponent(prompt)}`);
       
       if (!response.ok) {
         const errorData = await response.json();
