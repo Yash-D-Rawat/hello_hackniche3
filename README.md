@@ -14,9 +14,6 @@ This project is a feature-rich collaborative text editor designed to enhance the
 - **Rich Text Formatting**  
   Powered by Quill.js, the editor supports a full range of formatting options, including headers, lists, fonts, colors, image embedding, and more.
 
-- **Document Sharing**  
-  Users can invite others to collaborate by sending email invitations directly from the platform.
-
 - **PDF Export**  
   Download documents as clean, well-formatted PDFs for offline access or sharing.
 
@@ -52,9 +49,6 @@ This project is a feature-rich collaborative text editor designed to enhance the
 ---
 
 ### Version Control and Document Management
-
-- **Automatic Saving**  
-  Your work is auto-saved every 30 seconds to avoid data loss.
 
 - **Version History**  
   Manually save important versions and view a timestamped history with custom notes.
